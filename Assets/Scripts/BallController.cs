@@ -4,31 +4,25 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour {
 
-    public List<Transform> positions;
-    public List<GameObject> balls;
+    [HideInInspector]
+    public GameManager gameManager;
 
-    List<Transform> pathBall1 = new List<Transform>(); 
-    List<Transform> pathBall2 = new List<Transform>();
+    public Transform positions;
 
-    int originBall1;
-    int originBall2;
+    List<Transform> path = new List<Transform>();
 
-    public float moveDelay = 1f;
+    int origin;
+
+    public float moveDelay = 0.2f;
 
     private void Start()
-    { 
+    {
+        origin = 1;
+        transform.position = positions.GetChild(1).position;
 
-        //starting positions
-        balls[0].transform.position = positions[1].position;
-        balls[1].transform.position = positions[4].position;
-        originBall1 = 1;
-        originBall2 = 4;
+        path = RandomizePath(origin);
 
-        pathBall1 = RandomizePath(0, originBall1);
-        pathBall2 = RandomizePath(1, originBall2);
-
-        StartCoroutine(FollowPath(0, pathBall1));
-        StartCoroutine(FollowPath(1, pathBall2));
+        StartCoroutine(FollowPath(path));
 
     }
 
@@ -40,112 +34,96 @@ public class BallController : MonoBehaviour {
 
 
 
-    IEnumerator FollowPath(int ball, List<Transform> pathpositions)
+    IEnumerator FollowPath(List<Transform> pathpositions)
     {
 
         for (int i = 0; i < pathpositions.Count; i++)
         {
-            balls[ball].transform.position = pathpositions[i].position;
-            //Debug.Log("Moving " + ball);
+            transform.position = pathpositions[i].position;
             yield return new WaitForSeconds(moveDelay);
         }
 
-        if (ball == 0)
-        {
-            pathBall1 = RandomizePath(ball, originBall1);
-            StartCoroutine(FollowPath(ball, pathBall1));
-        }
-        else
-        {
-            pathBall2 = RandomizePath(ball, originBall2);
-            StartCoroutine(FollowPath(ball, pathBall2));
-        }
+        //Här ändras inte origin
+        Debug.Log(origin);
+
+        path = RandomizePath(origin);
+        StartCoroutine(FollowPath(path));
+       
     }
 
 
-    List<Transform> RandomizePath(int ball, int origin)
+    List<Transform> RandomizePath(int origin)
     {
-        List<Transform> path = new List<Transform>();
+        List<Transform> randomPath = new List<Transform>();
 
         if (origin < 3)
-            path = MakePath(ball, origin);
+            randomPath = MakePath(origin);
         else if (origin >= 3)
         {
-            path = MakeReversePath(ball, origin);
+            randomPath = MakeReversePath(origin);
         }
 
-        return path;
+        return randomPath;
     }
 
-    List<Transform> MakePath(int ball, int origin)
+    List<Transform> MakePath(int origin)
     {
-        List<Transform> path = new List<Transform>();
+        List<Transform> newPath = new List<Transform>();
         int rn = Random.Range(0,3);
 
         for (int i = 0; i < 6; i++)
         {
-            path.Add(positions[origin].GetChild(rn).GetChild(i).transform);
+            newPath.Add(positions.GetChild(origin).GetChild(rn).GetChild(i).transform);
         }
 
-        Path endpos = positions[origin].GetChild(rn).GetComponent<Path>();
+        Path endpos = positions.GetChild(origin).GetChild(rn).GetComponent<Path>();
 
-        if (ball == 0)
-        {
-            originBall1 = endpos.end;
-        }
-        else
-        {
-            originBall2 = endpos.end;
-        }
+        //Här ändras origin
+        origin = endpos.end;
 
-        return path;
+        return newPath;
     }
     
-    List<Transform> MakeReversePath(int ball, int origin)
+    List<Transform> MakeReversePath(int origin)
     {
-        List<Transform> path = new List<Transform>();
+        List<Transform> newReversePath = new List<Transform>();
         int rn = Random.Range(0, 3);
-        path.Add(positions[rn].transform);
+        newReversePath.Add(positions.GetChild(rn).transform);
 
-        Path endpos = positions[0].GetChild(0).GetComponent<Path>();
+        Path endpos = positions.GetChild(0).GetChild(0).GetComponent<Path>();
 
         switch (origin)
         {
             case 3:
                 for (int i = 0; i < 6; i++)
                 {
-                    path.Add(positions[rn].GetChild(0).GetChild(i).transform);
+                    newReversePath.Add(positions.GetChild(rn).GetChild(0).GetChild(i).transform);
                 }
-                endpos = positions[rn].GetChild(0).GetComponent<Path>();
+                endpos = positions.GetChild(rn).GetChild(0).GetComponent<Path>();
 
                 break;
             case 4:
                 for (int i = 0; i < 6; i++)
                 {
-                    path.Add(positions[rn].GetChild(1).GetChild(i).transform);
+                    newReversePath.Add(positions.GetChild(rn).GetChild(1).GetChild(i).transform);
                 }
-                endpos = positions[rn].GetChild(0).GetComponent<Path>();
+                endpos = positions.GetChild(rn).GetChild(0).GetComponent<Path>();
                 break;
             case 5:
                 for (int i = 0; i < 6; i++)
                 {
-                    path.Add(positions[rn].GetChild(2).GetChild(i).transform);
+                    newReversePath.Add(positions.GetChild(rn).GetChild(2).GetChild(i).transform);
                 }
-                endpos = positions[rn].GetChild(0).GetComponent<Path>();
+                endpos = positions.GetChild(rn).GetChild(0).GetComponent<Path>();
                 break;
 
         }
 
-        if (ball == 0)
-        {
-            originBall1 = endpos.start;
-        } else
-        {
-            originBall2 = endpos.start;
-        }
+        origin = endpos.start;
 
 
-        path.Reverse();
-        return path;
+
+        newReversePath.Reverse();
+        return newReversePath;
     }
 }

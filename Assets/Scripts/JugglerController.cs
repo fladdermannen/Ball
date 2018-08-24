@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JugglerManager : MonoBehaviour {
+public class JugglerController : MonoBehaviour {
 
     public List<GameObject> jugglers = new List<GameObject>();
     public List<Transform> positions;
@@ -11,6 +11,8 @@ public class JugglerManager : MonoBehaviour {
     GameObject mid;
     GameObject right;
     int position = 1;
+
+
 
     private void OnEnable()
     {
@@ -24,6 +26,7 @@ public class JugglerManager : MonoBehaviour {
         left.SetActive(false);
         mid.SetActive(true);
         right.SetActive(false);
+
     }
 
     private void OnDisable()
@@ -31,6 +34,7 @@ public class JugglerManager : MonoBehaviour {
         Input.OnLeftPressed -= Input_OnLeftPressed;
         Input.OnRightPressed -= Input_OnRightPressed;
     }
+
 
 
     private void Input_OnRightPressed()
