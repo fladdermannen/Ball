@@ -11,6 +11,8 @@ public class JugglerController : MonoBehaviour {
     GameObject mid;
     GameObject right;
     int position = 1;
+    [HideInInspector]
+    public bool inputLock;
 
 
 
@@ -27,6 +29,8 @@ public class JugglerController : MonoBehaviour {
         mid.SetActive(true);
         right.SetActive(false);
 
+        inputLock = false;
+
     }
 
     private void OnDisable()
@@ -40,15 +44,21 @@ public class JugglerController : MonoBehaviour {
     private void Input_OnRightPressed()
     {
         //Debug.Log("Right pressed");
-        if (StanceDance(1))
-            position++;
+        if (!inputLock)
+        {
+            if (StanceDance(1))
+                position++;
+        }
     }
 
     private void Input_OnLeftPressed()
     {
         //Debug.Log("Left pressed");
-        if (StanceDance(-1))
-            position--;
+        if (!inputLock)
+        {
+            if (StanceDance(-1))
+                position--;
+        }
     }
 
 
@@ -88,5 +98,13 @@ public class JugglerController : MonoBehaviour {
 
         }
         return true;
+    }
+
+    public void ResetJuggler()
+    {
+        left.SetActive(false);
+        mid.SetActive(true);
+        right.SetActive(false);
+        inputLock = false;
     }
 }

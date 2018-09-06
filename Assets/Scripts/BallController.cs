@@ -6,23 +6,24 @@ public class BallController : MonoBehaviour {
 
     [HideInInspector]
     public GameManager gameManager;
-
     public Transform positions;
 
     List<Transform> path = new List<Transform>();
 
+    Coroutine followPath;
     int origin;
 
-    public float moveDelay = 0.2f;
+    public float moveDelay = 0.8f;
 
     private void Start()
     {
+        
         origin = 1;
         transform.position = positions.GetChild(1).position;
 
         path = RandomizePath(origin);
+        followPath = StartCoroutine(FollowPath(path));
 
-        StartCoroutine(FollowPath(path));
 
     }
 
@@ -40,51 +41,54 @@ public class BallController : MonoBehaviour {
         for (int i = 0; i < pathpositions.Count; i++)
         {
             transform.position = pathpositions[i].position;
+            
             yield return new WaitForSeconds(moveDelay);
         }
 
-        //Här ändras inte origin
-        Debug.Log(origin);
 
-        path = RandomizePath(origin);
-        StartCoroutine(FollowPath(path));
+        if (gameManager.CheckCrash(gameObject))
+            StopCoroutine(followPath);
+        else
+        {
+            path = RandomizePath(origin);
+            followPath = StartCoroutine(FollowPath(path));
+        }
        
     }
 
 
-    List<Transform> RandomizePath(int origin)
+    List<Transform> RandomizePath(int orig)
     {
         List<Transform> randomPath = new List<Transform>();
 
-        if (origin < 3)
-            randomPath = MakePath(origin);
-        else if (origin >= 3)
+        if (orig < 3)
+            randomPath = MakePath(orig);
+        else if (orig >= 3)
         {
-            randomPath = MakeReversePath(origin);
+            randomPath = MakeReversePath(orig);
         }
 
         return randomPath;
     }
 
-    List<Transform> MakePath(int origin)
+    List<Transform> MakePath(int orig)
     {
         List<Transform> newPath = new List<Transform>();
         int rn = Random.Range(0,3);
 
         for (int i = 0; i < 6; i++)
         {
-            newPath.Add(positions.GetChild(origin).GetChild(rn).GetChild(i).transform);
+            newPath.Add(positions.GetChild(orig).GetChild(rn).GetChild(i).transform);
         }
 
-        Path endpos = positions.GetChild(origin).GetChild(rn).GetComponent<Path>();
+        Path endpos = positions.GetChild(orig).GetChild(rn).GetComponent<Path>();
 
-        //Här ändras origin
         origin = endpos.end;
-
+       
         return newPath;
     }
     
-    List<Transform> MakeReversePath(int origin)
+    List<Transform> MakeReversePath(int orig)
     {
         List<Transform> newReversePath = new List<Transform>();
         int rn = Random.Range(0, 3);
@@ -92,7 +96,7 @@ public class BallController : MonoBehaviour {
 
         Path endpos = positions.GetChild(0).GetChild(0).GetComponent<Path>();
 
-        switch (origin)
+        switch (orig)
         {
             case 3:
                 for (int i = 0; i < 6; i++)
@@ -122,8 +126,11 @@ public class BallController : MonoBehaviour {
         origin = endpos.start;
 
 
-
         newReversePath.Reverse();
+        Transform itemToRemove = newReversePath[0];
+        newReversePath.Remove(itemToRemove);
         return newReversePath;
     }
+
+   
 }
