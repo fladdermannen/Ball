@@ -18,8 +18,8 @@ public class JugglerController : MonoBehaviour {
 
     private void OnEnable()
     {
-        Input.OnLeftPressed += Input_OnLeftPressed;
-        Input.OnRightPressed += Input_OnRightPressed;
+        InputController.OnLeftPressed += Input_OnLeftPressed;
+        InputController.OnRightPressed += Input_OnRightPressed;
 
         left = jugglers[0].gameObject;
         mid = jugglers[1].gameObject;
@@ -35,8 +35,8 @@ public class JugglerController : MonoBehaviour {
 
     private void OnDisable()
     {
-        Input.OnLeftPressed -= Input_OnLeftPressed;
-        Input.OnRightPressed -= Input_OnRightPressed;
+        InputController.OnLeftPressed -= Input_OnLeftPressed;
+        InputController.OnRightPressed -= Input_OnRightPressed;
     }
 
 

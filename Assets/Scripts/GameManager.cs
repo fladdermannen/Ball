@@ -119,6 +119,7 @@ public class GameManager : MonoBehaviour
         score = 0;
         scoreObject.GetComponent<ScoreController>().SetPoints(score);
         button.SetActive(true);
+
         juggler.GetComponent<JugglerController>().inputLock = true;
         Debug.Log("Game Over");
     }
